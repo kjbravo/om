@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f05a19" />
+  <link rel="icon" href="data:," />
+  <title>Orange Machines</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --orange: #f05a19;
+      --orange-hi: #ff7638;
+      --orange-low: #dc3f09;
+      --ink: #17110e;
+      --paper: #fff0df;
+      --line: rgba(23, 17, 14, .45);
+      --faint: rgba(23, 17, 14, .13);
+      --shadow: rgba(103, 30, 0, .24);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --orange: #e94d11;
+        --orange-hi: #ff6a2d;
+        --orange-low: #a62c05;
+        --ink: #fff0df;
+        --paper: #17100d;
+        --line: rgba(255, 240, 223, .45);
+        --faint: rgba(255, 240, 223, .14);
+        --shadow: rgba(0, 0, 0, .38);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--orange);
+      color: var(--ink);
+      font-family: "IBM Plex Mono", monospace;
+      overflow-x: hidden;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: max(22px, env(safe-area-inset-top)) clamp(22px, 4vw, 62px) max(22px, env(safe-area-inset-bottom));
+      isolation: isolate;
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      pointer-events: none;
+      background:
+        linear-gradient(var(--faint) 1px, transparent 1px),
+        linear-gradient(90deg, var(--faint) 1px, transparent 1px);
+      background-size: clamp(34px, 5vw, 72px) clamp(34px, 5vw, 72px);
+      mask-image: linear-gradient(to bottom, transparent 2%, #000 28%, #000 72%, transparent 98%);
+    }
+
+    .topline, .bottomline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      font-size: 10px;
+      line-height: 1.3;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .topline::after, .bottomline::before {
+      content: "";
+      height: 1px;
+      background: var(--line);
+      flex: 1;
+    }
+
+    .topline .index { font-variant-numeric: tabular-nums; }
+
+    .stage {
+      position: relative;
+      min-height: 560px;
+      display: grid;
+      place-items: center;
+      padding: clamp(50px, 7vw, 100px) 0;
+    }
+
+    .word {
+      position: absolute;
+      z-index: -1;
+      margin: 0;
+      font-family: "Bodoni Moda", Georgia, serif;
+      font-size: clamp(84px, 15.2vw, 230px);
+      font-weight: 500;
+      line-height: .73;
+      letter-spacing: -.075em;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .word-one { top: 12%; left: -.03em; }
+    .word-two { right: -.02em; bottom: 10%; }
+
+    .machine-wrap {
+      width: min(46vw, 480px);
+      min-width: 340px;
+      aspect-ratio: 1;
+      position: relative;
+      filter: drop-shadow(0 26px 24px var(--shadow));
+    }
+
+    .machine-button {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .machine-button:focus-visible {
+      outline: 2px solid var(--paper);
+      outline-offset: 10px;
+    }
+
+    .machine { width: 100%; height: 100%; overflow: visible; }
+    .rotor, .orbit, .inner-rotor { transform-origin: 250px 250px; }
+    .rotor { animation: rotate 18s linear infinite; }
+    .orbit { animation: rotate 11s linear infinite; }
+    .inner-rotor { animation: rotate 7s linear infinite; }
+    .paused * { animation-play-state: paused !important; }
+
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    @keyframes rotate-back { to { transform: rotate(-360deg); } }
+
+    .machine text {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      fill: var(--ink);
+      text-transform: uppercase;
+    }
+
+    .pause-hint {
+      position: absolute;
+      inset: auto 0 -32px;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      opacity: .72;
+      transition: opacity .2s ease;
+    }
+
+    .machine-button:hover + .pause-hint { opacity: 1; }
+
+    .caption {
+      max-width: 25ch;
+      font-size: clamp(10px, 1vw, 12px);
+      line-height: 1.65;
+      letter-spacing: .03em;
+      margin: 0;
+    }
+
+    .bottomline { align-items: flex-end; }
+    .bottomline::before { order: 2; }
+    .bottomline .caption { order: 1; }
+    .bottomline .mark { order: 3; white-space: nowrap; }
+
+    @media (max-width: 700px) {
+      .page { padding-left: 20px; padding-right: 20px; }
+      .stage { min-height: 600px; padding: 72px 0; }
+      .word {
+        font-size: clamp(78px, 25.5vw, 130px);
+        line-height: .78;
+      }
+      .word-one { top: 13%; left: -3px; }
+      .word-two { right: 0; bottom: 12%; }
+      .machine-wrap { min-width: 0; width: min(86vw, 390px); }
+      .topline .descriptor { display: none; }
+      .bottomline { align-items: center; }
+      .caption { max-width: 21ch; font-size: 9px; }
+    }
+
+    @media (max-width: 430px) {
+      .stage { min-height: 540px; }
+      .word { font-size: 23vw; }
+      .word-one { top: 13%; }
+      .word-two { bottom: 13%; }
+      .machine-wrap { width: 84vw; }
+      .bottomline::before { display: none; }
+      .bottomline { justify-content: space-between; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rotor, .orbit, .inner-rotor { animation: none; }
+      .pause-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topline" aria-hidden="true">
+      <span class="index">No. 01</span>
+      <span class="descriptor">A study in perpetual orange</span>
+    </div>
+
+    <section class="stage" aria-labelledby="page-title">
+      <h1 id="page-title" class="word word-one">Orange</h1>
+      <div class="word word-two" aria-hidden="true">Machines</div>
+
+      <div class="machine-wrap">
+        <button class="machine-button" type="button" aria-label="Pause the orange machine" aria-pressed="false">
+          <svg class="machine" viewBox="0 0 500 500" role="img" aria-labelledby="machine-title machine-desc">
+            <title id="machine-title">An orange kinetic machine</title>
+            <desc id="machine-desc">Concentric mechanical rings turn around a segmented central form.</desc>
+            <defs>
+              <radialGradient id="face" cx="35%" cy="26%" r="72%">
+                <stop offset="0" stop-color="var(--orange-hi)"/>
+                <stop offset="1" stop-color="var(--orange-low)"/>
+              </radialGradient>
+              <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="var(--shadow)"/>
+              </filter>
+            </defs>
+
+            <g class="rotor" fill="none" stroke="var(--ink)">
+              <circle cx="250" cy="250" r="230" stroke-width="1" stroke-dasharray="2 13"/>
+              <circle cx="250" cy="250" r="211" stroke-width="2" stroke-dasharray="45 12 4 12"/>
+              <path d="M250 20v25M250 455v25M20 250h25M455 250h25" stroke-width="8"/>
+              <path d="M87 87l18 18M395 395l18 18M413 87l-18 18M105 395l-18 18" stroke-width="4"/>
+            </g>
+
+            <g class="orbit" fill="var(--paper)" stroke="var(--ink)" stroke-width="2">
+              <circle cx="250" cy="58" r="10"/>
+              <circle cx="442" cy="250" r="10"/>
+              <circle cx="250" cy="442" r="10"/>
+              <circle cx="58" cy="250" r="10"/>
+            </g>
+
+            <circle cx="250" cy="250" r="168" fill="var(--orange)" stroke="var(--ink)" stroke-width="2"/>
+            <circle cx="250" cy="250" r="152" fill="none" stroke="var(--ink)" stroke-width="1" stroke-dasharray="1 7"/>
+
+            <g class="inner-rotor" filter="url(#innerShadow)">
+              <path d="M250 250L250 112A138 138 0 0 1 347.6 152.4Z" fill="url(#face)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L347.6 152.4A138 138 0 0 1 388 250Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L388 250A138 138 0 0 1 347.6 347.6Z" fill="url(#face)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L347.6 347.6A138 138 0 0 1 250 388Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L250 388A138 138 0 0 1 152.4 347.6Z" fill="url(#face)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L152.4 347.6A138 138 0 0 1 112 250Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L112 250A138 138 0 0 1 152.4 152.4Z" fill="url(#face)" stroke="var(--ink)" stroke-width="3"/>
+              <path d="M250 250L152.4 152.4A138 138 0 0 1 250 112Z" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+            </g>
+
+            <circle cx="250" cy="250" r="57" fill="var(--orange)" stroke="var(--ink)" stroke-width="4"/>
+            <circle cx="250" cy="250" r="35" fill="var(--ink)"/>
+            <circle cx="250" cy="250" r="8" fill="var(--paper)"/>
+            <path d="M250 213v-22M287 250h22M250 287v22M213 250h-22" stroke="var(--ink)" stroke-width="3"/>
+            <text x="250" y="492" text-anchor="middle">continuous motion</text>
+          </svg>
+        </button>
+        <div class="pause-hint" aria-hidden="true">tap the mechanism to pause</div>
+      </div>
+    </section>
+
+    <div class="bottomline">
+      <p class="caption">One color. Many moving parts.</p>
+      <span class="mark">OM / 2026</span>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var button = document.querySelector('.machine-button');
+      var machine = document.querySelector('.machine');
+      var hint = document.querySelector('.pause-hint');
+      var paused = false;
+
+      button.addEventListener('click', function () {
+        paused = !paused;
+        machine.classList.toggle('paused', paused);
+        button.setAttribute('aria-pressed', String(paused));
+        button.setAttribute('aria-label', paused ? 'Start the orange machine' : 'Pause the orange machine');
+        hint.textContent = paused ? 'tap the mechanism to start' : 'tap the mechanism to pause';
+      });
+    })();
+  </script>
+</body>
+</html>
